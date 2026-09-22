@@ -1,0 +1,3 @@
+<?php require_once 'includes/functions.php'; require_login(); $id=(int)($_GET['id']??0); $pageTitle='Order Confirmed | GadgetKart';$basePath='';require 'includes/header.php'; ?>
+<section class="section"><div class="container"><div class="success-card"><div class="success-check">✓</div><span class="eyebrow">ORDER PLACED</span><h1>Thanks for shopping with GadgetKart!</h1><p>Your order <strong>#GK<?= str_pad((string)$id,5,'0',STR_PAD_LEFT) ?></strong> has been placed successfully.</p><a class="btn" href="products.php">Continue Shopping</a><a class="btn btn-light" href="index.php">Back to Home</a></div></div></section>
+<?php require 'includes/footer.php'; ?>

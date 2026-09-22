@@ -1,0 +1,11 @@
+<?php
+require_once '../includes/functions.php'; require_admin(); $error='';
+if($_SERVER['REQUEST_METHOD']==='POST'){
+$fields=['name','category','subcategory','price','stock','image','short_description','description'];foreach($fields as $f)${$f}=trim($_POST[$f]??'');$featured=isset($_POST['is_featured'])?1:0;
+if($name===''||$category===''||$subcategory===''||!is_numeric($price)||!is_numeric($stock)||$image===''||$description===''){$error='Please complete all required fields.';}else{$st=$conn->prepare('INSERT INTO products(name,category,subcategory,price,stock,image,short_description,description,is_featured) VALUES(?,?,?,?,?,?,?,?,?)');$price=(float)$price;$stock=(int)$stock;$st->bind_param('sssdisssi', $name,$category,$subcategory,$price,$stock,$image,$short_description,$description,$featured);}
+if(!$error){$st->execute();flash('notice','Product added successfully.');redirect('products.php');}
+}
+$pageTitle='Add Product | GadgetKart';$basePath='../';require '../includes/header.php';
+?>
+<section class="section"><div class="container narrow"><div class="form-card"><span class="eyebrow">ADMIN</span><h1>Add Product</h1><?php if($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?><form method="post"><div class="form-two"><label>Product name<input name="name" required></label><label>Price<input name="price" type="number" step="0.01" required></label></div><div class="form-two"><label>Category<select name="category" required><option>Mobile Accessories</option><option>Computer Accessories</option><option>Gaming</option></select></label><label>Subcategory<input name="subcategory" placeholder="e.g. Chargers" required></label></div><div class="form-two"><label>Stock<input name="stock" type="number" min="0" required></label><label>Image filename<input name="image" placeholder="product.svg" required></label></div><label>Short description<input name="short_description" required></label><label>Full description<textarea name="description" rows="6" required></textarea></label><label class="check"><input type="checkbox" name="is_featured"> Show on home page</label><button class="btn" type="submit">Save Product</button></form></div></div></section>
+<?php require '../includes/footer.php'; ?>
