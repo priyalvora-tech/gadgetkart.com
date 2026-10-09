@@ -1,0 +1,108 @@
+<?php
+require_once '../includes/functions.php';
+
+require_admin();
+
+$counts = [];
+foreach (['products', 'users', 'orders', 'contacts'] as $table) {
+    $r = $conn->query("SELECT COUNT(*) AS c FROM $table")->fetch_assoc();
+    $counts[$table] = (int)$r['c'];
+}
+
+$orders = $conn->query(
+    "SELECT o.*, u.name 
+     FROM orders o 
+     JOIN users u ON u.id = o.user_id 
+     ORDER BY o.id DESC 
+     LIMIT 8"
+);
+
+$pageTitle = 'Admin Dashboard | GadgetKart';
+$basePath  = '../';
+
+require '../includes/header.php';
+?>
+
+<!-- Page Banner -->
+<section class="page-banner">
+    <div class="container">
+        <span class="eyebrow">ADMIN PANEL</span>
+        <h1>Dashboard</h1>
+        <p>Manage catalogue and review customer activity.</p>
+    </div>
+</section>
+
+<!-- Dashboard Main Section -->
+<section class="section">
+    <div class="container">
+        <!-- Quick Actions -->
+        <div class="admin-actions">
+            <a class="btn" href="products.php">Manage Products</a>
+            <a class="btn btn-light" href="add-product.php">+ Add Product</a>
+            <a class="btn btn-light" href="../products.php">View Store</a>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="admin-stats">
+            <div>
+                <span>📦</span>
+                <strong><?= $counts['products'] ?></strong>
+                <small>Products</small>
+            </div>
+            <div>
+                <span>👥</span>
+                <strong><?= $counts['users'] ?></strong>
+                <small>Users</small>
+            </div>
+            <div>
+                <span>🧾</span>
+                <strong><?= $counts['orders'] ?></strong>
+                <small>Orders</small>
+            </div>
+            <div>
+                <span>✉️</span>
+                <strong><?= $counts['contacts'] ?></strong>
+                <small>Messages</small>
+            </div>
+        </div>
+
+        <!-- Recent Orders Card -->
+        <div class="admin-table-card">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">RECENT ORDERS</span>
+                    <h2>Latest activity</h2>
+                </div>
+            </div>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($o = $orders->fetch_assoc()): ?>
+                            <tr>
+                                <td>#GK<?= str_pad((string)$o['id'], 5, '0', STR_PAD_LEFT) ?></td>
+                                <td><?= e($o['name']) ?></td>
+                                <td>₹<?= number_format($o['total_amount'], 2) ?></td>
+                                <td>
+                                    <span class="status-pill"><?= e($o['status']) ?></span>
+                                </td>
+                                <td><?= e(date('d M Y', strtotime($o['created_at']))) ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php require '../includes/footer.php'; ?>
